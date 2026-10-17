@@ -1,5 +1,5 @@
 import User from "../models/User.js";
-import nodemailer from "nodemailer"; 
+import { Resend } from "resend";
 import env from "../config/env.js";
 import { OAuth2Client } from "google-auth-library";
 
@@ -137,6 +137,8 @@ const getCurrentUser = async (userId) => {
 // ============================================================
 // FORGOT PASSWORD
 // ============================================================
+
+
 const forgotPassword = async (email) => {
   // 1. Verify if the user exists in the database
   const user = await User.findByEmail(email);
@@ -156,22 +158,23 @@ const forgotPassword = async (email) => {
   // 4. Generate the HTML template (passing only the resetUrl argument)
   const emailHtml = getPasswordResetHTML(resetUrl);
 
-  // 5. Configure Nodemailer Transporter using the simplified Gmail service setting
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: env.emailUser, // Loaded from process.env.EMAIL_USER
-      pass: env.emailPass, // Loaded from process.env.EMAIL_PASS (16-character App Password)
-    },
-  });
+  // 5. Initialize Resend client using your dashboard environment token
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
-  // 6. Transmit the email to the user
-  await transporter.sendMail({
-    from: `"Evangadi Forum Support" <${env.emailUser}>`,
-    to: user.email,
+  // 6. Transmit the email to the user over a secure HTTPS web request channel
+  const { error } = await resend.emails.send({
+    // Note: Resend's free tier requires sending FROM onboarding@resend.dev
+    from: "Evangadi Forum Support <onboarding@resend.dev>",
+    to: [user.email],
     subject: "Password Reset Request",
     html: emailHtml,
   });
+
+  if (error) {
+    const mailError = new Error("Mail engine delivery failed.");
+    mailError.statusCode = 500;
+    throw mailError;
+  }
 
   return { message: "Reset token sent successfully." };
 };
