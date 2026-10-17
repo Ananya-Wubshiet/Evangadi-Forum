@@ -2,7 +2,7 @@
 
 A full-stack discussion platform that modernizes the community learning experience. This application extends a traditional forum with cutting-edge artificial intelligence, featuring semantic search, an AI writing assistant, and a private, document-based knowledge base powered by Retrieval-Augmented Generation (RAG).
 
-### 🌐 [Click Here to View the Live Application](https://Evangadi-Forum.netlify.app/) 🚀
+### 🌐 [Click Here to View the Live Application](https://ananya-evangadi-forum.netlify.app/) 🚀
 ---
 
 ## 📌 Project Overview

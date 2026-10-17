@@ -138,7 +138,6 @@ const getCurrentUser = async (userId) => {
 // FORGOT PASSWORD
 // ============================================================
 
-
 const forgotPassword = async (email) => {
   // 1. Verify if the user exists in the database
   const user = await User.findByEmail(email);
