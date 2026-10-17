@@ -26,13 +26,10 @@
     "multer": "^2.4.0",
     "mysql2": "^3.24.3",
     "nodemailer": "^10.0.14",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse-fork": "^1.2.0",
     "google-auth-library": "^10.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
-  },
-  "overrides": {
-    "pdfjs-dist": "3.11.174"
   }
 }
