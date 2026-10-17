@@ -88,7 +88,6 @@ const searchDocument = async (document, query, requestedK) => ({
     (result) => result.score >= env.rag.searchThreshold,
   ),
 });
-
 const extractDocumentContent = async (filePath) => {
   const extension = path.extname(filePath).toLowerCase();
 
@@ -99,23 +98,23 @@ const extractDocumentContent = async (filePath) => {
     };
   }
 
-  const parser = new PDFParse({
-    data: await fs.readFile(filePath),
-  });
+  // Read the physical file data buffer
+  const dataBuffer = await fs.readFile(filePath);
 
-  try {
-    const result = await parser.getText();
-    return {
-      text: result.text || "",
-      pages: result.pages.map((page) => ({
-        pageNumber: page.num,
-        text: page.text,
-      })),
-    };
-  } finally {
-    await parser.destroy();
-  }
+  // Call PDFParse directly as an async function natively
+  const result = await PDFParse(dataBuffer);
+
+  return {
+    text: result.text || "",
+    pages: result.pages
+      ? result.pages.map((page) => ({
+          pageNumber: page.num,
+          text: page.text,
+        }))
+      : [{ pageNumber: 1, text: result.text || "" }],
+  };
 };
+
 
 const extractText = async (filePath) =>
   (await extractDocumentContent(filePath)).text;
