@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import pkg from "pdf-parse-fork";
-const { PDFParse } = pkg;
+import PDFParse from "pdf-parse-fork";
 import env from "../config/env.js";
 import * as ai from "../ai/gemini.js";
 import { cosineSimilarity } from "../ai/vectorMath.js";
