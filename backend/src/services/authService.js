@@ -157,23 +157,23 @@ const forgotPassword = async (email) => {
 
   try {
     // 5. Initialize Brevo client securely and transmit over a secure HTTPS web request channel
-    const response = await fetch("https://brevo.com", {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
-        "accept": "application/json",
+        accept: "application/json",
         "api-key": process.env.BREVO_API_KEY,
-        "content-type": "application/json"
+        "content-type": "application/json",
       },
       body: JSON.stringify({
         // Note: Replace this with the exact personal email address you used to register your Brevo Account
-        sender: { 
-          name: "Evangadi Forum Support", 
-          email: "EvangadiForum20@gmail.com" 
+        sender: {
+          name: "Evangadi Forum Support",
+          email: "evangadiforum20@gmail.com",
         },
         to: [{ email: user.email }],
         subject: "Password Reset Request",
-        htmlContent: emailHtml
-      })
+        htmlContent: emailHtml,
+      }),
     });
 
     // 6. Verify if the API server processed the delivery request successfully
