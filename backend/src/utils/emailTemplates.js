@@ -13,7 +13,7 @@ export const getPasswordResetHTML = (resetLink) => {
         <a href="${resetLink}" style="background-color: #ea580c; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block;">Reset Password</a>
       </div>
       <!-- 💡 Fallback Clean Text URL Layout Bypass For Brevo Compliance Delivery Filters -->
-      <p style="color: #64748b; font-size: 13px; margin-top: 35px; line-height: 1.5;">If the button above throws an error or does not open your page directly, please highlight, copy, and paste the complete raw link URL block below straight into your web browser address bar:</p>
+      <p style="color: #64748b; font-size: 13px; margin-top: 35px; line-height: 1.5;">If the button above throws an error or does not open your page directly, please highlight <strong>remove space after netlify.app</strong>, copy, and paste the complete raw link URL block below straight into your web browser address bar:</p>
       
       <!-- 👇 THE FIX: Added white-space: nowrap and overflow-x: auto to freeze the text on ONE single continuous line -->
       <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #ea580c; padding: 14px; margin: 15px 0; border-radius: 6px; font-family: monospace; font-size: 12px; color: #0f172a; line-height: 1.45; white-space: nowrap; overflow-x: auto;">${resetLink}</div>
