@@ -1,5 +1,5 @@
 import User from "../models/User.js";
-import * as SibApiV3Sdk from "@getbrevo/brevo";
+import SibApiV3Sdk from "@getbrevo/brevo";
 import env from "../config/env.js";
 import { OAuth2Client } from "google-auth-library";
 
@@ -134,7 +134,7 @@ const getCurrentUser = async (userId) => {
 };
 
 // ============================================================
-// FORGOT PASSWORD (UPDATED FOR BREVO)
+// FORGOT PASSWORD
 // ============================================================
 
 const forgotPassword = async (email) => {
@@ -156,32 +156,31 @@ const forgotPassword = async (email) => {
   // 4. Generate the HTML template (passing only the resetUrl argument)
   const emailHtml = getPasswordResetHTML(resetUrl);
 
-  // 5. Initialize Brevo API client using your dashboard environment token
+  // 5. Initialize Brevo client securely using modern syntax rules
   const defaultClient = SibApiV3Sdk.ApiClient.instance;
   const apiKey = defaultClient.authentications['api-key'];
-  apiKey.apiKey = process.env.BREVO_API_KEY; // Make sure this matches your Render environment variable name
+  apiKey.apiKey = process.env.BREVO_API_KEY;
 
   const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
-  // 6. Structure the Brevo payload matching your exact data requirements
+  // 6. Transmit the email to the user over a secure HTTPS web request channel
   sendSmtpEmail.subject = "Password Reset Request";
   sendSmtpEmail.htmlContent = emailHtml;
   
-  // Note: Replace this email with the specific personal email you used to register your Brevo account
+  // Note: Replace this with the exact email address you used to register your Brevo Account
   sendSmtpEmail.sender = { 
     name: "Evangadi Forum Support", 
-    email: "Evangadiforum20@gmail.com" 
+    email: "EvangadiForum20@gmail.com" 
   };
   
   sendSmtpEmail.to = [{ email: user.email }];
 
   try {
-    // Transmit the email to the user over a secure HTTPS web request channel
     await apiInstance.sendTransacEmail(sendSmtpEmail);
     return { message: "Reset token sent successfully." };
   } catch (error) {
-    console.error("Brevo Delivery Error Details:", error);
+    console.error("Brevo Production Error Log:", error);
     const mailError = new Error("Mail engine delivery failed.");
     mailError.statusCode = 500;
     throw mailError;
