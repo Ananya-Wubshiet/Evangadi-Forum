@@ -163,6 +163,7 @@ const forgotPassword = async (email) => {
         accept: "application/json",
         "api-key": process.env.BREVO_API_KEY,
         "content-type": "application/json",
+        "X-Mailin-Tag": "no-track"
       },
       body: JSON.stringify({
         // Note: Replace this with the exact personal email address you used to register your Brevo Account
