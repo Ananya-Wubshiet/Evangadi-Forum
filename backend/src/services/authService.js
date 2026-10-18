@@ -1,8 +1,4 @@
 import User from "../models/User.js";
-// Force Node to support the old Brevo module format in modern ESM environment
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const SibApiV3Sdk = require("@getbrevo/brevo").default;
 import env from "../config/env.js";
 import { OAuth2Client } from "google-auth-library";
 
@@ -159,36 +155,47 @@ const forgotPassword = async (email) => {
   // 4. Generate the HTML template (passing only the resetUrl argument)
   const emailHtml = getPasswordResetHTML(resetUrl);
 
-  // 5. Initialize Brevo client securely using native require mapping
-  const defaultClient = SibApiV3Sdk.ApiClient.instance;
-  const apiKey = defaultClient.authentications["api-key"];
-  apiKey.apiKey = process.env.BREVO_API_KEY;
-
-  const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
-  // 6. Transmit the email to the user over a secure HTTPS web request channel
-  sendSmtpEmail.subject = "Password Reset Request";
-  sendSmtpEmail.htmlContent = emailHtml;
-
-  // Note: Replace this with the exact email address you used to register your Brevo Account
-  sendSmtpEmail.sender = {
-    name: "Evangadi Forum Support",
-    email: "EvangadiForum20@gmail.com",
-  };
-
-  sendSmtpEmail.to = [{ email: user.email }];
-
   try {
-    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    // 5. Initialize Brevo client securely and transmit over a secure HTTPS web request channel
+    const response = await fetch("https://brevo.com", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": process.env.BREVO_API_KEY,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        // Note: Replace this with the exact personal email address you used to register your Brevo Account
+        sender: { 
+          name: "Evangadi Forum Support", 
+          email: "EvangadiForum20@gmail.com" 
+        },
+        to: [{ email: user.email }],
+        subject: "Password Reset Request",
+        htmlContent: emailHtml
+      })
+    });
+
+    // 6. Verify if the API server processed the delivery request successfully
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Brevo API Connection Refused:", errorData);
+      
+      const mailError = new Error("Mail engine delivery failed.");
+      mailError.statusCode = 500;
+      throw mailError;
+    }
+
     return { message: "Reset token sent successfully." };
+
   } catch (error) {
-    console.error("Brevo Production Error Log:", error);
+    console.error("Critical delivery failure:", error);
     const mailError = new Error("Mail engine delivery failed.");
     mailError.statusCode = 500;
     throw mailError;
   }
-};;;
+};
+
 
 
 // ============================================================
