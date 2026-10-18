@@ -179,15 +179,19 @@ const forgotPassword = async (email) => {
     // 6. Verify if the API server processed the delivery request successfully
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Brevo API Connection Refused:", errorData);
-      
+      // 👇 ADD THESE TWO DIAGNOSTIC LINES RIGHT HERE:
+      console.error("🔴 BREVO SERVER RAW ERROR STATUS:", response.status);
+      console.error(
+        "🔴 BREVO SERVER RAW ERROR MESSAGE:",
+        JSON.stringify(errorData),
+      );
+
       const mailError = new Error("Mail engine delivery failed.");
       mailError.statusCode = 500;
       throw mailError;
     }
 
     return { message: "Reset token sent successfully." };
-
   } catch (error) {
     console.error("Critical delivery failure:", error);
     const mailError = new Error("Mail engine delivery failed.");
