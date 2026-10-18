@@ -1,5 +1,10 @@
 import User from "../models/User.js";
-import SibApiV3Sdk from "@getbrevo/brevo";
+import {
+  ApiClient,
+  TransactionalEmailsApi,
+  SendSmtpEmail,
+} from "@getbrevo/brevo";
+
 import env from "../config/env.js";
 import { OAuth2Client } from "google-auth-library";
 
@@ -156,24 +161,24 @@ const forgotPassword = async (email) => {
   // 4. Generate the HTML template (passing only the resetUrl argument)
   const emailHtml = getPasswordResetHTML(resetUrl);
 
-  // 5. Initialize Brevo client securely using modern syntax rules
-  const defaultClient = SibApiV3Sdk.ApiClient.instance;
-  const apiKey = defaultClient.authentications['api-key'];
+  // 5. Initialize Brevo client securely using destructured classes
+  const defaultClient = ApiClient.instance; // <-- No prefix needed!
+  const apiKey = defaultClient.authentications["api-key"];
   apiKey.apiKey = process.env.BREVO_API_KEY;
 
-  const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+  const apiInstance = new TransactionalEmailsApi(); // <-- No prefix needed!
+  const sendSmtpEmail = new SendSmtpEmail(); // <-- No prefix needed!
 
   // 6. Transmit the email to the user over a secure HTTPS web request channel
   sendSmtpEmail.subject = "Password Reset Request";
   sendSmtpEmail.htmlContent = emailHtml;
-  
+
   // Note: Replace this with the exact email address you used to register your Brevo Account
-  sendSmtpEmail.sender = { 
-    name: "Evangadi Forum Support", 
-    email: "EvangadiForum20@gmail.com" 
+  sendSmtpEmail.sender = {
+    name: "Evangadi Forum Support",
+    email: "EvangadiForum20@gmail.com",
   };
-  
+
   sendSmtpEmail.to = [{ email: user.email }];
 
   try {
