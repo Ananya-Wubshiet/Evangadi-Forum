@@ -2,7 +2,7 @@ import User from "../models/User.js";
 // Force Node to support the old Brevo module format in modern ESM environment
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
-const SibApiV3Sdk = require("@getbrevo/brevo");
+const SibApiV3Sdk = require("@getbrevo/brevo").default;
 import env from "../config/env.js";
 import { OAuth2Client } from "google-auth-library";
 
