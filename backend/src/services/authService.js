@@ -1,5 +1,5 @@
 import User from "../models/User.js";
-import { Resend } from "resend";
+import * as SibApiV3Sdk from "@getbrevo/brevo";
 import env from "../config/env.js";
 import { OAuth2Client } from "google-auth-library";
 
@@ -133,9 +133,8 @@ const getCurrentUser = async (userId) => {
   };
 };
 
-
 // ============================================================
-// FORGOT PASSWORD
+// FORGOT PASSWORD (UPDATED FOR BREVO)
 // ============================================================
 
 const forgotPassword = async (email) => {
@@ -157,26 +156,38 @@ const forgotPassword = async (email) => {
   // 4. Generate the HTML template (passing only the resetUrl argument)
   const emailHtml = getPasswordResetHTML(resetUrl);
 
-  // 5. Initialize Resend client using your dashboard environment token
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  // 5. Initialize Brevo API client using your dashboard environment token
+  const defaultClient = SibApiV3Sdk.ApiClient.instance;
+  const apiKey = defaultClient.authentications['api-key'];
+  apiKey.apiKey = process.env.BREVO_API_KEY; // Make sure this matches your Render environment variable name
 
-  // 6. Transmit the email to the user over a secure HTTPS web request channel
-  const { error } = await resend.emails.send({
-    // Note: Resend's free tier requires sending FROM onboarding@resend.dev
-    from: "Evangadi Forum Support <onboarding@resend.dev>",
-    to: [user.email],
-    subject: "Password Reset Request",
-    html: emailHtml,
-  });
+  const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
-  if (error) {
+  // 6. Structure the Brevo payload matching your exact data requirements
+  sendSmtpEmail.subject = "Password Reset Request";
+  sendSmtpEmail.htmlContent = emailHtml;
+  
+  // Note: Replace this email with the specific personal email you used to register your Brevo account
+  sendSmtpEmail.sender = { 
+    name: "Evangadi Forum Support", 
+    email: "Evangadiforum20@gmail.com" 
+  };
+  
+  sendSmtpEmail.to = [{ email: user.email }];
+
+  try {
+    // Transmit the email to the user over a secure HTTPS web request channel
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    return { message: "Reset token sent successfully." };
+  } catch (error) {
+    console.error("Brevo Delivery Error Details:", error);
     const mailError = new Error("Mail engine delivery failed.");
     mailError.statusCode = 500;
     throw mailError;
   }
-
-  return { message: "Reset token sent successfully." };
 };
+
 
 // ============================================================
 // RESET PASSWORD CONFIRM
